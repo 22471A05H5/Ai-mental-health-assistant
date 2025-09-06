@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Affirmations = () => {
@@ -80,14 +80,15 @@ const Affirmations = () => {
   };
 
   useEffect(() => {
-    const savedFavorites = localStorage.getItem('favoriteAffirmations');
+    // Load favorites from localStorage
+    const savedFavorites = localStorage.getItem('affirmationFavorites');
     if (savedFavorites) {
       setFavorites(JSON.parse(savedFavorites));
     }
     
     // Set initial affirmation
     getNewAffirmation();
-  }, []);
+  }, [getNewAffirmation]);
 
   useEffect(() => {
     if (isAutoPlay) {
@@ -107,13 +108,13 @@ const Affirmations = () => {
         clearInterval(autoPlayInterval);
       }
     };
-  }, [isAutoPlay]);
+  }, [isAutoPlay, autoPlayInterval, getNewAffirmation]);
 
-  const getNewAffirmation = () => {
+  const getNewAffirmation = useCallback(() => {
     const categoryAffirmations = affirmations[category];
     const randomAffirmation = categoryAffirmations[Math.floor(Math.random() * categoryAffirmations.length)];
     setCurrentAffirmation(randomAffirmation);
-  };
+  }, [category, affirmations]);
 
   const toggleFavorite = (affirmation) => {
     const updatedFavorites = favorites.includes(affirmation)
